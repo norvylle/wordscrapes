@@ -97,6 +97,6 @@ public class Generate{
             System.out.println("Missing arguments.");
         }
         long endTime   = System.nanoTime();
-        System.out.println(TimeUnit.NANOSECONDS.toSeconds(endTime-startTime+" seconds"));
+        // System.out.println(TimeUnit.NANOSECONDS.toSeconds(endTime-startTime));
     }
 }

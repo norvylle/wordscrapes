@@ -17,8 +17,8 @@ app.listen(3001, () =>{
 });
 
 async function execute(a,b,res){
-    console.log('> ./a.out '+a+' '+b)
-    exec('./a.out '+a+' '+b,(err, stdout, stderr) => {
+    console.log('> java Generate '+a+' '+b)
+    exec('java Generate '+a+' '+b,(err, stdout, stderr) => {
         if(err){
             res.sendStatus(400);
         }
