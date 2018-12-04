@@ -29,18 +29,29 @@ class App extends Component {
       list[i] = {value: list[i], count: Math.round( Math.random() * 23 + 12)}
     }
     await this.setState({data: list});
-    this.setState({isloading: false, loaded: true});
+    this.setState({loaded: true});
   }
 
   handleSearch(e){
     this.setState({search: e.target.value})
   }
 
+  timeout(ms, promise) {
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {
+        reject(new Error("timeout"))
+      }, ms)
+      promise.then(resolve, reject)
+    })
+  }
+
   handleClick(){
     this.setState({isloading: true, loaded: false});
-    fetch(`http://localhost:3001/?letters=${this.state.letters}&search=${this.state.search}`)
+    this.timeout(12000000, fetch(`http://localhost:3001/?letters=${this.state.letters}&search=${this.state.search}`))
     .then((response) => { return response.json()})
-    .then((data) => {this.mapMessage(data[0])})
+    .then((data) => {this.mapMessage(data[0]); this.setState({isloading: false});})
+    .catch((error) => {console.log(error); this.setState({isloading: false});})
+
   }
 
   DataCloud(props){
@@ -71,7 +82,7 @@ class App extends Component {
               </Menu.Item>
           </Menu>
           <div style={{padding: 50}}/>
-          <Input placeholder='Letters' onChange={this.handleLetters} size="big" style={{padding: 10}} maxLength="29" />
+          <Input placeholder='Letters' onChange={this.handleLetters} size="big" style={{padding: 10}} />
           <Input placeholder='Search' onChange={this.handleSearch} size="big" style={{padding: 10}} maxLength={this.state.letters.length} />          
           <Button content="Generate" size="big" style={{marginLeft: 10}} onClick={this.handleClick}/>
           <div style={{padding: 50}}/>

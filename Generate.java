@@ -1,10 +1,13 @@
 import java.io.*;
 import java.util.HashSet;
+import java.util.TreeSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Generate{
     
-    static HashSet<String> read(HashSet<String> wordsHashSet){
+    static TreeSet<String> read(TreeSet<String> wordsHashSet){
         File file = new File("words.txt");
         try{
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -24,7 +27,7 @@ public class Generate{
     }
 
     public static void main(String[] args) {
-        HashSet<String> wordsHashSet = new HashSet<String>(); 
+        TreeSet<String> wordsHashSet = new TreeSet<String>(); 
         HashSet<String> genwords = new HashSet<String>();
         String letters;
         String toFind;
@@ -85,8 +88,19 @@ public class Generate{
                             for(i=move-1; i>0; i--)
                                 if(c == option[i][nopts[i]])
                                     break;
-                            if(!(i>0))
-                                option[move][++nopts[move]] = c;
+                                if(!(i>0)){
+                                    option[move][++nopts[move]] = c;
+                                }
+                        }
+                        temp = "";
+                        for(i=1; option[i][nopts[i]]-1 > -1; i++){
+                            temp = temp + letters.charAt(option[i][nopts[i]]-1);
+                        }
+                        final String temp1 = temp;
+                        Set<String> set =  wordsHashSet.stream().filter(word -> word.startsWith(temp1))
+                            .collect(Collectors.toSet());
+                        if(set.size() == 0){
+                            nopts[move]++;
                         }
                     }
                 }else{
@@ -97,6 +111,6 @@ public class Generate{
             System.out.println("Missing arguments.");
         }
         long endTime   = System.nanoTime();
-        // System.out.println(TimeUnit.NANOSECONDS.toSeconds(endTime-startTime));
+        System.out.println(TimeUnit.NANOSECONDS.toSeconds(endTime-startTime)+"seconds");
     }
 }
