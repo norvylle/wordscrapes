@@ -1,30 +1,106 @@
+
+import java.util.HashMap; 
 import java.io.*;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
+// Trie Node, which stores a character and the children in a HashMap 
+class TrieNode { 
+    public TrieNode(char ch)  { 
+        value = ch; 
+        children = new HashMap<>(); 
+        bIsEnd = false; 
+    } 
+    public HashMap<Character,TrieNode> getChildren() {   return children;  } 
+    public char getValue()                           {   return value;     } 
+    public void setIsEnd(boolean val)                {   bIsEnd = val;     } 
+    public boolean isEnd()                           {   return bIsEnd;    } 
+  
+    private char value; 
+    private HashMap<Character,TrieNode> children; 
+    private boolean bIsEnd; 
+} 
+  
+// Implements the actual Trie 
+class Trie { 
+    // Constructor 
+    public Trie()   {     root = new TrieNode((char)0);       }     
+  
+    // Method to insert a new word to Trie 
+    public void insert(String word)  { 
+  
+        // Find length of the given word 
+        int length = word.length(); 
+        TrieNode crawl = root; 
+  
+        // Traverse through all characters of given word 
+        for( int level = 0; level < length; level++) 
+        { 
+            HashMap<Character,TrieNode> child = crawl.getChildren(); 
+            char ch = word.charAt(level); 
+  
+            // If there is already a child for current character of given word 
+            if( child.containsKey(ch)){ 
+                crawl = child.get(ch);
+            } 
+            else   // Else create a child 
+            { 
+                TrieNode temp = new TrieNode(ch);
+                child.put( ch, temp ); 
+                crawl = temp; 
+            } 
+        } 
+  
+        // Set bIsEnd true for last character 
+        crawl.setIsEnd(true); 
+    } 
+  
+    public boolean search(String input)  { 
+        TrieNode crawl = root;
+        int length = input.length();    
+        int level; 
+        
+        for( level = 0 ; level < length; level++ ){ 
+            char ch = input.charAt(level);
+            HashMap<Character,TrieNode> child = crawl.getChildren();                     
+            if( child.containsKey(ch)) crawl = child.get(ch);
+            else break;
+        }
+        
+        if(level == length) return true;
+        else return false;
+    } 
+  
+    private TrieNode root; 
+} 
+// source: https://www.geeksforgeeks.org/longest-prefix-matching-a-trie-based-solution-in-java/
 
-public class Generate{
-    
-    static HashSet<String> read(HashSet<String> wordsHashSet){
+  
+// Testing class 
+public class Generate {
+
+    static Trie read(HashSet<String> words){
+        Trie dict = new Trie();
         File file = new File("words.txt");
         try{
         BufferedReader br = new BufferedReader(new FileReader(file));
-
+    
         String st;
         br.readLine();
         while((st = br.readLine()) != null){
-            wordsHashSet.add(st);
+            dict.insert(st);
+            words.add(st);
         }
         br.close();
         }
         catch(Exception e){
             System.out.println(e);
         }
-
-        return wordsHashSet;
+    
+        return dict;
     }
-
-    public static void main(String[] args) {
-        HashSet<String> wordsHashSet = new HashSet<String>(); 
+   public static void main(String[] args) { 
+         
+        HashSet<String> words = new HashSet<String>();
         HashSet<String> genwords = new HashSet<String>();
         String letters;
         String toFind;
@@ -35,9 +111,10 @@ public class Generate{
         int[][] option;
         int start, move, i, c, checker;
         long startTime = System.nanoTime();
-
+        
+        Trie dict = read(words);
         if(args != null){
-            read(wordsHashSet);
+           
             letters = args[0];
             toFind = args[1];
             wordLength = args[0].length();
@@ -55,6 +132,8 @@ public class Generate{
             nopts[start] = 1;
 
             while(nopts[start] > 0){
+                
+            
                 if(nopts[move] > 0){
                     nopts[++move] = 0;
                     if(move == toFindLength + 1){
@@ -73,22 +152,40 @@ public class Generate{
                                 }
                             }
                         }
-                        if(checker == 1 && !genwords.contains(temp)){
-                            if(wordsHashSet.contains(temp)){
+                        if(checker == 1 && !genwords.contains(temp)){  
+                            if(words.contains(temp)){
                                 genwords.add(temp);
                                 System.out.println(temp);
                             }
-
+                            
                         }
                     }else{
+                        
+                        
                         for(c=wordLength; c>=1; c--){
+                            
                             for(i=move-1; i>0; i--)
                                 if(c == option[i][nopts[i]])
                                     break;
-                            if(!(i>0))
+                            if(!(i>0)){
                                 option[move][++nopts[move]] = c;
+                            }
+
+                            
                         }
+
+                        temp = "";
+                        for(i=1; i<=move; i++){
+                            temp = temp + letters.charAt(option[i][nopts[i]]-1);
+                        }
+                        // System.out.println(temp);
+                        if(!dict.search(temp)){
+                            if(move != 0) nopts[move]--;
+                            else continue;
+                        } 
+                        
                     }
+
                 }else{
                     nopts[--move]--;
                 }
@@ -96,7 +193,8 @@ public class Generate{
         }else{
             System.out.println("Missing arguments.");
         }
-        long endTime   = System.nanoTime();
-        // System.out.println(TimeUnit.NANOSECONDS.toSeconds(endTime-startTime));
-    }
+        long endTime = System.nanoTime();
+        System.out.println(TimeUnit.NANOSECONDS.toSeconds(endTime - startTime)+" seconds");
+        // System.out.println(dict.search(args[0]));
+    } 
 }
