@@ -8,16 +8,12 @@ class TrieNode {
     public TrieNode(char ch)  { 
         value = ch; 
         children = new HashMap<>(); 
-        bIsEnd = false; 
     } 
     public HashMap<Character,TrieNode> getChildren() {   return children;  } 
     public char getValue()                           {   return value;     } 
-    public void setIsEnd(boolean val)                {   bIsEnd = val;     } 
-    public boolean isEnd()                           {   return bIsEnd;    } 
   
     private char value; 
     private HashMap<Character,TrieNode> children; 
-    private boolean bIsEnd; 
 } 
   
 // Implements the actual Trie 
@@ -48,10 +44,7 @@ class Trie {
                 child.put( ch, temp ); 
                 crawl = temp; 
             } 
-        } 
-  
-        // Set bIsEnd true for last character 
-        crawl.setIsEnd(true); 
+        }  
     } 
   
     public boolean search(String input)  { 
@@ -178,11 +171,19 @@ public class Generate {
                         for(i=1; i<=move; i++){
                             temp = temp + letters.charAt(option[i][nopts[i]]-1);
                         }
-                        // System.out.println(temp);
-                        if(!dict.search(temp)){
-                            if(move != 0) nopts[move]--;
-                            else continue;
-                        } 
+                        
+                        while(!dict.search(temp)){
+                            if(move != 0 && nopts[move] != 1 ){
+                                nopts[move]--;
+                                temp = "";
+                                for(i=1; i<=move; i++){
+                                    temp = temp + letters.charAt(option[i][nopts[i]]-1);
+                                }
+                                continue;
+                            }
+                            break;
+                            
+                        }
                         
                     }
 
