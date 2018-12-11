@@ -19,7 +19,6 @@ class App extends Component {
 
   async handleLetters(e){
     await this.setState({letters: e.target.value});
-    this.setState({search: new Array(this.state.letters.length)})
   }
 
   async mapMessage(data){
@@ -37,10 +36,17 @@ class App extends Component {
   }
 
   handleClick(){
-    this.setState({isloading: true, loaded: false});
-    fetch(`http://localhost:3001/?letters=${this.state.letters}&search=${this.state.search}`)
-    .then((response) => { return response.json()})
-    .then((data) => {this.mapMessage(data[0])})
+    let expr = /^([a-z _])+$/;  // no quotes here
+    if(expr.test(this.state.search)){
+      this.setState({isloading: true, loaded: false});
+      fetch(`http://localhost:3001/?letters=${this.state.letters}&search=${this.state.search}`)
+      .then((response) => { return response.json()})
+      .then((data) => {this.mapMessage(data[0])})
+    }
+    else{
+      alert("Search value must contain either '_' or lowercase letters (a-z)");
+      this.setState({search: ""});
+    }
   }
 
   DataCloud(props){
@@ -71,8 +77,8 @@ class App extends Component {
               </Menu.Item>
           </Menu>
           <div style={{padding: 50}}/>
-          <Input placeholder='Letters' onChange={this.handleLetters} size="big" style={{padding: 10}} maxLength="29" />
-          <Input placeholder='Search' onChange={this.handleSearch} size="big" style={{padding: 10}} maxLength={this.state.letters.length} />          
+          <Input placeholder='Letters' onChange={this.handleLetters} size="big" style={{padding: 10}} />
+          <Input placeholder='Search' value={this.state.search} onChange={this.handleSearch} size="big" style={{padding: 10}} maxLength={this.state.letters.length} />          
           <Button content="Generate" size="big" style={{marginLeft: 10}} onClick={this.handleClick}/>
           <div style={{padding: 50}}/>
           <div style={{alignSelf: "center", padding: 50}}>

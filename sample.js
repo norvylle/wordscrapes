@@ -12,10 +12,11 @@ app.get('/',function(req,res){
     }
 });
 
-app.listen(3001, () =>{
+const server = app.listen(3001, () =>{
     console.log("API is running at port 3001...");
 });
 
+server.timeout = 1000000000;
 async function execute(a,b,res){
     console.log('> java Generate '+a+' '+b)
     exec('java Generate '+a+' '+b,(err, stdout, stderr) => {

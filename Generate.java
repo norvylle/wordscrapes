@@ -161,7 +161,6 @@ public class Generate {
                         }
                     }else{
                         
-                        
                         for(c=wordLength; c>=1; c--){
                             
                             for(i=move-1; i>0; i--)
@@ -178,11 +177,22 @@ public class Generate {
                         for(i=1; i<=move; i++){
                             temp = temp + letters.charAt(option[i][nopts[i]]-1);
                         }
-                        // System.out.println(temp);
-                        if(!dict.search(temp)){
-                            if(move != 0) nopts[move]--;
-                            else continue;
-                        } 
+                        
+                        while(!dict.search(temp)){
+                            if(move != 0 && nopts[move] != 1 ){
+                                nopts[move]--;
+                                temp = "";
+                                for(i=1; i<=move; i++){
+                                    temp = temp + letters.charAt(option[i][nopts[i]]-1);
+                                }
+                                continue;
+                            }
+                            else{
+                                nopts[--move]--;
+                                break;
+                            }
+                            
+                        }
                         
                     }
 
